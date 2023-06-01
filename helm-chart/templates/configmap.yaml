@@ -1,0 +1,16 @@
+{{- $namespace := .Release.Namespace -}}
+
+{{- range $path, $bytes := .Files.Glob "values/**" }}
+{{- $name := base (base $path) }}
+---
+apiVersion: v1
+binaryData:
+  {{ regexReplaceAll "\\W+" (lower $path | replace "_" "-") "-" }} : {{ $.Files.Get $path | b64enc }}
+
+kind: ConfigMap
+metadata:
+  name: springboot-config-{{ regexReplaceAll "\\W+" (lower $path | replace "_" "-") "-" }}
+  namespace: {{ $namespace  }}
+
+{{ end }}
+

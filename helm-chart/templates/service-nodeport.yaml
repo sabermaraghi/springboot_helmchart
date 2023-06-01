@@ -1,0 +1,20 @@
+{{- $chartname := .Chart.Name -}}
+{{ if and .Values.service.enabled .Values.service.nodeports.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $chartname }}-nodeport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ $chartname }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - name: "http-port"
+    port: 8090
+    targetPort: http-port
+    nodePort: {{ index .Values "service" "nodeports" "ports" "http" }}
+  selector:
+    app.kubernetes.io/name: {{ $chartname }}
+{{ end }}
+

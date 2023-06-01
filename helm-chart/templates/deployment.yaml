@@ -1,0 +1,158 @@
+{{- $chartname := .Chart.Name -}}
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ $chartname }}
+  labels:
+    app.kubernetes.io/name: {{ $chartname }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ $chartname }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  template:
+    metadata:
+      annotations:
+        checksum/configmap.yaml: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha1sum }}
+      labels:
+        app.kubernetes.io/name: {{ $chartname }}
+    spec:
+      hostAliases:
+      {{ range $key, $value := index .Values.extrahosts }}
+      - ip: {{  $value | quote }}
+        hostnames:
+        - {{ $key | quote }}
+      {{ end }}
+
+      {{- if index .Values.affinity.enabled}}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: "app.kubernetes.io/name"
+                      operator: In
+                      values:
+                        - {{ $chartname }}
+                topologyKey: kubernetes.io/hostname
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "springboot.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+      {{- range $path, $bytes := .Files.Glob "values/**" }}
+      {{- $name := base (base $path) }}
+      - name: vol-{{ regexReplaceAll "\\W+" (lower (trunc -59 $path) | replace "_" "-") "-" }}
+        configMap:
+          defaultMode: 511
+          items:
+          - key: {{ regexReplaceAll "\\W+" (lower $path | replace "_" "-") "-" }}
+            path: {{ $name }}
+          name: springboot-config-{{ regexReplaceAll "\\W+" (lower $path | replace "_" "-") "-" }}
+          optional: false
+      {{- end }}
+
+      - emptyDir: {}
+        name: vol-log
+      - emptyDir: {}
+        name: vol-tmp
+
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - all
+          image: "{{ .Values.image.repository }}{{ .Values.image.tag }}"
+          command: ["/bin/bash", "-c", "java -Dlogging.config=/app/config/logback.xml -Dspring.config.location=/app/config/application.properties -jar app.jar" ]
+          #command: [ "/bin/bash", "-c", " sleep 666666" ] 
+          {{ if index .Values.jmx.enabled }}
+          command:
+            - java
+            - -jar
+            - -Dcom.sun.management.jmxremote
+            - -Dcom.sun.management.jmxremote.authenticate=false
+            - -Dcom.sun.management.jmxremote.ssl=false
+            - -Dcom.sun.management.jmxremote.local.only=false
+            - -Dcom.sun.management.jmxremote.port={{ index .Values.jmx.port }}
+            - -Dcom.sun.management.jmxremote.rmi.port={{ index .Values.jmx.port }}
+            - -Djava.rmi.server.hostname={{ index .Values.jmx.hostname }}
+            - /app/app.jar
+          {{ end }}
+ 
+          env:
+          - name: JAVA_OPTS
+            value: "-Dfile.encoding=UTF8"
+          - name: TZ
+            value: {{ .Values.timezone | default "Asia/Tehran" }}
+
+          volumeMounts:
+          {{- range $path, $bytes := .Files.Glob "values/**" }}
+          {{- $name := base (base $path) }}
+            - mountPath: /app/config/{{ trimPrefix "values/" $path }}
+              name: vol-{{ regexReplaceAll "\\W+" (lower (trunc -59 $path) | replace "_" "-") "-" }}
+              subPath: {{ $name }}
+          {{- end }}
+
+            - mountPath: /var/log/{{ $chartname }}/
+              name: vol-log
+            - mountPath: /tmp/
+              name: vol-tmp
+
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http-port
+              containerPort: 8090
+              protocol: TCP
+
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: {{ index .Values.probe.liveness.path }}
+              port: http-port
+              scheme: HTTP
+            initialDelaySeconds: {{ index .Values.probe.liveness.initialDelaySeconds }}
+            periodSeconds: {{ index .Values.probe.liveness.periodSeconds }}
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: {{ index .Values.probe.readiness.path  }}
+              port: http-port
+              scheme: HTTP
+            initialDelaySeconds: {{ index .Values.probe.readiness.initialDelaySeconds | default 120 }}
+            periodSeconds: 15 
+            successThreshold: 1
+            timeoutSeconds: 5
+
+          {{- if index .Values.resources.enabled }}
+          resources: {{ index .Values.resources.values | toYaml | nindent 12 }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

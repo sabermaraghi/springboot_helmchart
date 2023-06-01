@@ -1,0 +1,137 @@
+#namespace: "saberspboot"
+
+replicaCount: 1
+image:
+  registry: novinrepo:8082
+  repository: novinrepo:8082/docker/springdemo:0.1.0 
+  pullPolicy: Always
+  tag: ""
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+podAnnotations: {}
+podSecurityContext: {}
+
+securityContext: {}
+service:
+  enabled: true
+  type: NodePort
+#  port: 8090 
+  nodeports:
+    enabled: true
+    ports: 
+      http: 30122
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+resources:
+  enabled: true
+  values:
+    limits:
+      memory: "4000Mi"
+      cpu: "4000m"
+    requests:
+      memory: "64Mi"
+      cpu: "64m"
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  enabled: true
+
+health-check:
+  enabled: true
+
+container:
+  port: 8090
+probe:
+  liveness:
+    path: /actuator/health/liveness
+    port: 8090
+    initialDelaySeconds: 30
+    periodSeconds: 10
+
+  readiness:
+    path: /actuator/health/readiness
+    initialDelaySeconds: 20
+    periodSeconds: 10
+
+timezone: Asia/Tehran
+
+network-policy:
+  enabled: true
+  ingress:
+    crds:
+      - name: central-bank
+        host: 192.168.68.16/32
+        port: 8090
+    pods:
+      - name: channel-manager
+        namespace: channel-manager
+        labels:
+          - app.kubernetes.io/name: channel-manager
+        port: 3030
+        protocol: TCP
+
+      - name: prometheus
+        namespace: monitoring
+        labels:
+          - app.kubernetes.io/name: prometheus
+        port: 8080
+        protocol: TCP
+
+  egress:
+    crds:
+      - name: logstash
+        host: 192.168.1.1/32
+        port: 4560
+    pods:
+      - name: kube-dns
+        namespace: kube-system
+        labels:
+          - k8s-app: kube-dns
+        port: 53
+        protocol: UDP
+
+extrahosts:
+  "ws.shetabvas.nibn.ir": "192.168.1.1"
+
+jmx:
+  enabled: true
+  hostname: 127.0.0.1
+  port: 8089
+
+filebeat:
+  image:
+    registry: novinrepo:8082
+    repository: docker/elastic/filebeat
+    tag: 7.16.1
+  health-check:
+    enabled: true
+  resources:
+    enabled: true
+    values:
+      limits:
+        memory: "1024Mi"
+        cpu: "1000m"
+      requests:
+        memory: "64Mi"
+        cpu: "64m"
+
+

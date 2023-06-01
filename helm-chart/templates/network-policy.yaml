@@ -1,0 +1,78 @@
+{{ $appname := .Chart.Name }}
+{{- if index .Values "network-policy" "enabled" }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ $appname }}-policy
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ $appname }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector: {}
+  
+    {{- if index .Values "network-policy" "ingress" }}
+    {{- range $rule := index .Values "network-policy" "ingress" "crds" }}
+    - from:
+        - ipBlock:
+            cidr: {{ index $rule.host }}
+      ports:
+        - port: {{ index $rule.port }}
+    {{- end }}
+      
+    {{- range $rule := index .Values "network-policy" "ingress" "pods" }}
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ index $rule.namespace }}
+          podSelector:
+            matchLabels:
+              {{- range $k, $v := $rule.labels }}
+              {{- range $kk, $vv := $v }}
+              {{ $kk }}: {{ $vv }}
+              {{- end }}
+              {{- end }}
+      ports:
+        - port: {{ index $rule.port }}
+          protocol: {{ index $rule.protocol }}
+    {{- end }}
+    {{- end }}
+  
+  egress:
+      
+    {{- if index .Values "network-policy" "egress" }}
+    {{- range $rule := index .Values "network-policy" "egress" "pods" }}
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ index $rule.namespace }}
+          podSelector:
+            matchLabels:
+              {{- range $k, $v := $rule.labels }}
+              {{- range $kk, $vv := $v }}
+              {{ $kk }}: {{ $vv }}
+              {{- end }}
+              {{- end }}
+      ports:
+        - port: {{ index $rule.port }}
+          protocol: {{ index $rule.protocol }}
+    {{- end }}
+  
+    {{- range $rule := index .Values "network-policy" "egress" "crds" }}
+    - to:
+        - ipBlock:
+            cidr: {{ index $rule.host }}
+      ports:
+        - port: {{ index $rule.port }}
+    {{- end }}
+      
+    {{- end }}
+  
+    - to:
+        - podSelector: {}
+{{- end }}

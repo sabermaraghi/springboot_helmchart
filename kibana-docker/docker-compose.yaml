@@ -1,0 +1,36 @@
+version: '3.2'
+services:
+
+  logstash:
+    image: novinrepo:8082/docker/logstash:7.10.1
+    volumes:
+      - ./logstash/config/:/usr/share/logstash/config/
+      - ./logstash/pipeline/:/usr/share/logstash/pipeline/
+      - ./sample-log/:/sample-log/
+    ports:
+      - "4560:4560/tcp"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+
+  elasticsearch:
+    image: novinrepo:8082/docker/elasticsearch:7.10.1
+    environment:
+      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
+      discovery.type: single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./elasticsearch/data/:/usr/share/elasticsearch/data
+      - ./elasticsearch/snapshots:/opt/snapshots
+    ports:
+      - 9200:9200
+
+  kibana:
+    image: novinrepo:8082/docker/kibana:7.10.1
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - "5601:5601"
+

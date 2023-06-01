@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dapi-test-pod
+spec:
+  containers:
+    - name: spring-boot-demo
+      image: novinrepo:8082/docker/springdemo:0.1.0
+      command: [ "/bin/bash", "-c", "java -jar -Dspring.config.location=/app/config/public/application.properties app.jar" ]
+      volumeMounts:
+      - name: config-volume
+        mountPath: /app/config/public
+  volumes:
+    - name: config-volume
+      configMap:
+        # Provide the name of the ConfigMap containing the files you want
+        # to add to the container
+        name: spring-boot-configmaps-demo
+  restartPolicy: Never

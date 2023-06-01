@@ -1,0 +1,20 @@
+version: '2'
+services:
+  springdemo:
+    container_name: springdemo
+    build: .
+    ports:
+      - 8080:8080
+
+# mvn clean package
+# docker-compose up
+# curl http://localhost:8080/saber
+
+# docker container commit 7dfafe5707d1 springdemo:0.1.0
+# docker image ls |grep springdemo
+# docker tag springdemo:0.1.0 novinrepo:8082/docker/springdemo:0.1.0
+# docker push  novinrepo:8082/docker/springdemo:0.1.0
+
+# helm create springboot
+# helm install myfirstspringboot springboot
+# curl ip:8080/saber

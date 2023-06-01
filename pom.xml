@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.9</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.example</groupId>
+    <artifactId>saber</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>saber</name>
+    <description>saber</description>
+    <properties>
+	<java.version>11</java.version>
+	<docker.skip>true</docker.skip>
+	<docker.skip.push>true</docker.skip.push>
+	<docker.registry>dockerrepo.tosanltd.com</docker.registry>
+	<helm.skip>true</helm.skip>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+	
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+	
+	<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+            <version>3.0.6</version>
+        </dependency>
+	<dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>7.2</version>
+            <scope>runtime</scope>
+        </dependency>
+	<dependency>
+            <groupId>ch.qos.logback</groupId>
+	    <artifactId>logback-classic</artifactId>
+	    <version>1.2.3</version>
+        </dependency>
+	<dependency>
+	    <groupId>ch.qos.logback</groupId>
+	    <artifactId>logback-core</artifactId>
+	    <version>1.2.3</version>
+    </dependency>
+    <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>2.2.2.RELEASE</version>
+    </dependency>
+    </dependencies>
+    <build>
+<resources>
+                   <resource>
+                       <directory>helm-chart</directory>
+                       <filtering>true</filtering>
+                       <targetPath>../helm-chart</targetPath>
+                   </resource>
+                   <resource>
+                       <directory>src/main/resources</directory>
+                       <filtering>false</filtering>
+                   </resource>
+	   </resources>
+
+	    <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+	    </plugin>
+
+
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.37.0</version>
+                <executions>
+			        <execution>
+					<id>save</id>
+					<phase>package</phase>
+					<goals>
+						<goal>build</goal>
+						<goal>save</goal>
+						<goal>remove</goal>
+					</goals>
+					<configuration>
+						<images>
+							<image>
+								<name>
+									novinrepo:8082/docker/${project.groupId}/${project.artifactId}:${project.version}
+							        </name>
+							</image>
+						</images>
+						<saveFile>
+							${project.build.directory}/${project.artifactId}-${project.version}-docker.tar.gz
+					        </saveFile>
+					</configuration>
+			        </execution>
+		</executions>
+	    </plugin> 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-resources-plugin</artifactId>
+	<version>3.3.1</version>
+</plugin>
+
+    </plugins>
+
+
+    </build>
+
+ </project>

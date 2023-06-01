@@ -1,0 +1,217 @@
+---
+# Source: springboot/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: release-name-springboot
+  labels:
+    helm.sh/chart: springboot-0.1.0
+    app.kubernetes.io/name: springboot
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  namespace: test
+---
+# Source: springboot/templates/configmap.yaml
+apiVersion: v1
+binaryData:
+  values-application-properties : c2VydmVyLnBvcnQ9ODA5MAo=
+
+kind: ConfigMap
+metadata:
+  name: springboot-config-values-application-properties
+  namespace: test
+---
+# Source: springboot/templates/configmap.yaml
+apiVersion: v1
+binaryData:
+  values-logback-xml : PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPGNvbmZpZ3VyYXRpb24+CiAgIDxwcm9wZXJ0eSBuYW1lPSJMT0dfRElSIiB2YWx1ZT0iL3Zhci9sb2cvIiAvPgogICA8cHJvcGVydHkgbmFtZT0iUEFUVEVSTiIgc2NvcGU9ImNvbnRleHQiIHZhbHVlPSIlZCBbJXRocmVhZF0gJS01bGV2ZWwgJS01MGxvZ2dlcns0MH0gLSAlbXNnJW4iLz4KICAgCiAgIDxwcm9wZXJ0eSBuYW1lPSJTVEFDS19UUkFDRV9DT1VOVCIgdmFsdWU9IjE1Ii8+CiAgIDxwcm9wZXJ0eSBuYW1lPSJDTEFTU19OQU1FX0xFTkdUSCIgdmFsdWU9IjQwIi8+CiAgIAkgICAKICAgPGFwcGVuZGVyIG5hbWU9IkxPR1NUQVNIIiBjbGFzcz0ibmV0LmxvZ3N0YXNoLmxvZ2JhY2suYXBwZW5kZXIuTG9nc3Rhc2hUY3BTb2NrZXRBcHBlbmRlciI+CiAgICAgICA8ZGVzdGluYXRpb24+MTkyLjE2OC43LjEyOTozMDMxMDwvZGVzdGluYXRpb24+CiAgICAgICA8YWRkRGVmYXVsdFN0YXR1c0xpc3RlbmVyPmZhbHNlPC9hZGREZWZhdWx0U3RhdHVzTGlzdGVuZXI+CgogICAgICAgPCEtLQogICAgICAgPHdyaXRlQnVmZmVyU2l6ZT4xMDI0PC93cml0ZUJ1ZmZlclNpemU+CiAgICAgICAtLT4KCiAgICAgICA8ZW5jb2RlciBjbGFzcz0ibmV0LmxvZ3N0YXNoLmxvZ2JhY2suZW5jb2Rlci5Mb2dnaW5nRXZlbnRDb21wb3NpdGVKc29uRW5jb2RlciI+CiAgICAgICAgICAgPHByb3ZpZGVycz4KICAgICAgICAgICAgICAgPHBhdHRlcm4+CiAgICAgICAgICAgICAgICAgICA8cGF0dGVybj57ImFwcF9uYW1lIjogIm15Zmlyc3RzcHJpbmdib290In08L3BhdHRlcm4+CiAgICAgICAgICAgICAgIDwvcGF0dGVybj4KICAgICAgICAgICAgICAgPG1kYy8+CiAgICAgICAgICAgICAgIDx0aW1lc3RhbXAvPgogICAgICAgICAgICAgICA8bWVzc2FnZS8+CiAgICAgICAgICAgICAgIDx0aHJlYWROYW1lLz4KICAgICAgICAgICAgICAgPGxvZ0xldmVsLz4KICAgICAgICAgICAgICAgPGNhbGxlckRhdGEvPgogICAgICAgICAgICAgICA8c3RhY2tUcmFjZT4KICAgICAgICAgICAgICAgICAgIDx0aHJvd2FibGVDb252ZXJ0ZXIgY2xhc3M9Im5ldC5sb2dzdGFzaC5sb2diYWNrLnN0YWNrdHJhY2UuU2hvcnRlbmVkVGhyb3dhYmxlQ29udmVydGVyIj4KICAgICAgICAgICAgICAgICAgICAgICA8bWF4RGVwdGhQZXJUaHJvd2FibGU+JHtTVEFDS19UUkFDRV9DT1VOVH08L21heERlcHRoUGVyVGhyb3dhYmxlPgogICAgICAgICAgICAgICAgICAgICAgIDxzaG9ydGVuZWRDbGFzc05hbWVMZW5ndGg+JHtDTEFTU19OQU1FX0xFTkdUSH08L3Nob3J0ZW5lZENsYXNzTmFtZUxlbmd0aD4KICAgICAgICAgICAgICAgICAgICAgICA8cm9vdENhdXNlRmlyc3Q+dHJ1ZTwvcm9vdENhdXNlRmlyc3Q+CiAgICAgICAgICAgICAgICAgICA8L3Rocm93YWJsZUNvbnZlcnRlcj4KICAgICAgICAgICAgICAgPC9zdGFja1RyYWNlPgogICAgICAgICAgIDwvcHJvdmlkZXJzPgogICAgICAgPC9lbmNvZGVyPgogICA8L2FwcGVuZGVyPgoKICAgIDxhcHBlbmRlciBuYW1lPSJDT05TT0xFIiBjbGFzcz0iY2gucW9zLmxvZ2JhY2suY29yZS5Db25zb2xlQXBwZW5kZXIiPgogICAgICAgIDxlbmNvZGVyPgogICAgICAgICAgICA8cGF0dGVybj4ke1BBVFRFUk59PC9wYXR0ZXJuPgogICAgICAgIDwvZW5jb2Rlcj4KICAgIDwvYXBwZW5kZXI+CgogICAgPGxvZ2dlciBuYW1lPSJvcmcuc3ByaW5nZnJhbWV3b3JrLndlYiI+CiAgICAgICAgPGxldmVsIHZhbHVlPSJERUJVRyIgLz4KICAgIDwvbG9nZ2VyPgoKICAgIDxyb290IGxldmVsPSJJTkZPIj4KICAgICAgIDxhcHBlbmRlci1yZWYgcmVmPSJMT0dTVEFTSCIvPgogICAgICAgPGFwcGVuZGVyLXJlZiByZWY9IkNPTlNPTEUiIC8+CjwhLS0gICAgICAgIDxhcHBlbmRlci1yZWYgcmVmPSJSb2xsaW5nRmlsZSIgLz4tLT4KICAgIDwvcm9vdD4KPC9jb25maWd1cmF0aW9uPgogCg==
+
+kind: ConfigMap
+metadata:
+  name: springboot-config-values-logback-xml
+  namespace: test
+---
+# Source: springboot/templates/service-nodeport.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-nodeport
+  namespace: test
+  labels:
+    app.kubernetes.io/name: springboot
+spec:
+  type: NodePort
+  ports:
+  - name: "http-port"
+    port: 8080
+    targetPort: http-port
+    nodePort: 30122
+  selector:
+    app.kubernetes.io/name: springboot
+---
+# Source: springboot/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot
+  namespace: test
+  labels:
+    app.kubernetes.io/name: springboot
+spec:
+  type: ClusterIP
+  ports:
+  - name: "http-port"
+    port: 8080
+    targetPort: http-port
+  selector:
+    app.kubernetes.io/name: springboot
+---
+# Source: springboot/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: springboot
+  labels:
+    app.kubernetes.io/name: springboot
+  namespace: test
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: springboot
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  template:
+    metadata:
+      annotations:
+        checksum/configmap.yaml: 2e421d3fba150713298841d2dea3661b7d0f988a
+      labels:
+        app.kubernetes.io/name: springboot
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: "app.kubernetes.io/name"
+                      operator: In
+                      values:
+                        - springboot
+                topologyKey: kubernetes.io/hostname
+      serviceAccountName: release-name-springboot
+      securityContext:
+        {}
+      volumes:
+      - name: vol-values-application-properties
+        configMap:
+          defaultMode: 511
+          items:
+          - key: values-application-properties
+            path: application.properties
+          name: springboot-config-values-application-properties
+          optional: false
+      - name: vol-values-logback-xml
+        configMap:
+          defaultMode: 511
+          items:
+          - key: values-logback-xml
+            path: logback.xml
+          name: springboot-config-values-logback-xml
+          optional: false
+
+      - emptyDir: {}
+        name: vol-log
+      - emptyDir: {}
+        name: vol-tmp
+
+      containers:
+        - name: springboot
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - all
+          image: "novinrepo:8082/docker/springdemo:0.1.0"
+          command: ["/bin/bash", "-c", "java -Dlogging.config=/app/config/logback.xml -Dspring.config.location=/app/config/application.properties -jar app.jar" ]
+          #command: [ "/bin/bash", "-c", " sleep 666666" ] 
+
+          env:
+          - name: JAVA_OPTS
+            value: "-Dfile.encoding=UTF8"
+          - name: TZ
+            value: Asia/Tehran
+
+          volumeMounts:
+            - mountPath: /app/config/application.properties
+              name: vol-values-application-properties
+              subPath: application.properties
+            - mountPath: /app/config/logback.xml
+              name: vol-values-logback-xml
+              subPath: logback.xml
+
+            - mountPath: /var/log/springboot/
+              name: vol-log
+            - mountPath: /tmp/
+              name: vol-tmp
+
+          imagePullPolicy: Always
+          ports:
+            - name: http-port
+              containerPort: 8090
+              protocol: TCP
+
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /actuator/health/liveness
+              port: http-port
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /actuator/health/readiness
+              port: http-port
+              scheme: HTTP
+            initialDelaySeconds: 20
+            periodSeconds: 15 
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources: 
+            limits:
+              cpu: 4000m
+              memory: 4000Mi
+            requests:
+              cpu: 64m
+              memory: 64Mi
+      affinity:
+        enabled: true
+---
+# Source: springboot/templates/hpa.yaml
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+    name: springboot
+    namespace: test
+spec:
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: StatefulSet
+      name: springboot
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80

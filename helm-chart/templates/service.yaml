@@ -1,0 +1,18 @@
+{{- $chartname := .Chart.Name -}}
+{{ if .Values.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $chartname }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ $chartname }}
+spec:
+  type: ClusterIP
+  ports:
+  - name: "http-port"
+    port: 8090
+    targetPort: http-port
+  selector:
+    app.kubernetes.io/name: {{ $chartname }}
+{{ end }}

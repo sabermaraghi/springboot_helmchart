@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+   <property name="LOG_DIR" value="/var/log/" />
+   <property name="PATTERN" scope="context" value="%d [%thread] %-5level %-50logger{40} - %msg%n"/>
+   
+   <property name="STACK_TRACE_COUNT" value="15"/>
+   <property name="CLASS_NAME_LENGTH" value="40"/>
+   	   
+   <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+       <destination>192.168.7.129:30310</destination>
+       <addDefaultStatusListener>false</addDefaultStatusListener>
+
+       <!--
+       <writeBufferSize>1024</writeBufferSize>
+       -->
+
+       <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+           <providers>
+               <pattern>
+                   <pattern>{"app_name": "myfirstspringboot"}</pattern>
+               </pattern>
+               <mdc/>
+               <timestamp/>
+               <message/>
+               <threadName/>
+               <logLevel/>
+               <callerData/>
+               <stackTrace>
+                   <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                       <maxDepthPerThrowable>${STACK_TRACE_COUNT}</maxDepthPerThrowable>
+                       <shortenedClassNameLength>${CLASS_NAME_LENGTH}</shortenedClassNameLength>
+                       <rootCauseFirst>true</rootCauseFirst>
+                   </throwableConverter>
+               </stackTrace>
+           </providers>
+       </encoder>
+   </appender>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.springframework.web">
+        <level value="DEBUG" />
+    </logger>
+
+    <root level="INFO">
+       <appender-ref ref="LOGSTASH"/>
+       <appender-ref ref="CONSOLE" />
+<!--        <appender-ref ref="RollingFile" />-->
+    </root>
+</configuration>
+
+
+
+
+
+
+
+
+

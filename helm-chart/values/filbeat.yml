@@ -1,0 +1,32 @@
+filebeat.inputs:
+- type: tcp
+  max_message_size: 20MiB
+  host: "0.0.0.0:9000"
+  fields_under_root: true
+ 
+processors:
+  - drop_fields:
+      fields: ["agent", "host.name", "input.type", "log.source.address", "ecs.version"]
+      ignore_missing: true
+  - decode_json_fields:
+      fields: ["message"]
+      target: ""
+      overwrite_keys: true
+      add_error_key: true
+  - drop_fields:
+      fields: ["message"]
+      ignore_missing: true
+ 
+output.elasticsearch:
+  hosts: ["http://192.168.7.91:32402", "http://192.168.7.129:32402", "http://192.168.7.131:32402"]
+  index: "operationlog-%{[app_name]}-%{+YYYY-MM-dd}"
+ 
+setup:
+  template:
+    enabled: false
+  ilm:
+    enabled: false
+ 
+http:
+  enabled: true
+  host: 0.0.0.0
