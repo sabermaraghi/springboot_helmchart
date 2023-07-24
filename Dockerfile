@@ -1,4 +1,4 @@
-FROM novinrepo:8082/docker/debian:buster
+FROM debian:buster
 RUN mkdir /app
 WORKDIR /app 
 ADD ./target/*-SNAPSHOT-docker.tar.gz /app/
@@ -8,7 +8,8 @@ ADD ${JAR_FILE} app.jar
 
 RUN chmod -R 777 /app
 
-FROM novinrepo:8082/docker/oracle-jdk:11-buster
+FROM openjdk:11-buster
+#FROM oracle-jdk:11-buster
 ENV TZ Asia/Tehran
 RUN mkdir /app
 WORKDIR /app
